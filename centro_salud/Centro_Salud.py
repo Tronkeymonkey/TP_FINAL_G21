@@ -58,33 +58,6 @@ class CentroSalud:
         y provincia usa el auto mas veloz. Marca el vehiculo como "ocupado" y lo despaca con una distancia aleatoria 
         correspondiente al tipo de viaje. 
         """
-        '''
-        if receptores.partido != self.partido: #condicion para llamar al helicopter
-            distancia = rnd.randint(20,300) #distancia en km
-            for i in self.lista_vehiculos:
-                if isinstance(i, Helicoptero): # si pertenece a la clase helicoptero
-                    if i.disponibilidad == "Disponible":
-                        i.disponibilidad = "Ocupado"
-                        return i.despachar(distancia)
-                
-        elif receptores.provincia != self.provincia: #condicion para llamar al avion
-            distancia = rnd.randint(300,1700) #distancia en km
-            for i in self.lista_vehiculos:
-                if isinstance(i,Avion): #si pertenece  a la clase avion
-                    if i.disponibilidad == "Disponible":
-                        i.disponibilidad = "Ocupado"
-                        return i.despachar(distancia)
-
-        elif receptores.partido == self.partido and receptores.provincia == self.provincia: #condicion para llamar al terrestre (y mas veloz)
-            distancia = rnd.randint(1,20) #distancia en km
-            autos_disponibles = [i for i in self.lista_vehiculos
-                                 if isinstance(i, Auto) and i.disponibilidad == "Disponible"]
-
-            if autos_disponibles:
-                auto_mas_rapido = max(autos_disponibles, key=lambda i: i.velocidad_viajes)
-                auto_mas_rapido.disponibilidad = "Ocupado"
-                return auto_mas_rapido.despachar(distancia)
-        '''
         # Verificar que el receptor no sea None
         if receptor is None:
             print("Error: No se puede asignar vehículo, receptor es None")
@@ -192,11 +165,11 @@ class CentroSalud:
             print("Error: No se puede operar, tiempo es None")
             return
 
-        # NUEVO: Buscar el mejor cirujano disponible para el órgano específico
+        #Buscar el mejor cirujano disponible para el órgano específico
         cirujano_asignado = self.obtener_mejor_cirujano_para_organo(receptor.organo_a_recibir)
 
         if cirujano_asignado is None:
-            print(f"❌ No hay cirujanos disponibles en {self.nombre}")
+            print(f" No hay cirujanos disponibles en {self.nombre}")
             # Mostrar información sobre cuándo estarán disponibles
             print("Estado actual de cirujanos:")
             for cirujano in self.lista_cirujanos:
@@ -208,15 +181,15 @@ class CentroSalud:
             return
 
         # Realizar la cirugía
-        print(f"🩺 Asignando cirujano {cirujano_asignado.especialidad.title()} para {receptor.organo_a_recibir}")
+        print(f" Asignando cirujano {cirujano_asignado.especialidad.title()} para {receptor.organo_a_recibir}")
 
         resultado_cirugia = cirujano_asignado.realizar_cirujia(tiempo, receptor)
 
         if resultado_cirugia:
             self.pacientes_exitosos.append(receptor)
-            print(f"✅ Paciente {receptor.nombre} agregado a lista de exitosos")
+            print(f" Paciente {receptor.nombre} agregado a lista de exitosos")
         else:
             self.pacientes_fallidos.append(receptor)
-            print(f"❌ Paciente {receptor.nombre} agregado a lista de fallidos")
+            print(f" Paciente {receptor.nombre} agregado a lista de fallidos")
 
             

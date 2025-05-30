@@ -85,7 +85,7 @@ def listas_receptores_por_centro(incucai: INCUCAI):
 
     # Mostrar receptores inestables
     if inestables:
-        print(f"\n🚨 RECEPTORES INESTABLES (PRIORIDAD CRÍTICA):")
+        print(f"\n RECEPTORES INESTABLES (PRIORIDAD CRÍTICA):")
         print("-" * 50)
         for i in inestables:
             print(
@@ -94,7 +94,7 @@ def listas_receptores_por_centro(incucai: INCUCAI):
 
     # Mostrar receptores estables
     if estables:
-        print(f"\n📋 RECEPTORES ESTABLES:")
+        print(f"\n RECEPTORES ESTABLES:")
         print("-" * 30)
         for i in estables:
             print(
@@ -202,11 +202,9 @@ def agregar_receptor(incucai: INCUCAI):
         espera_input = input("Fecha de espera (YYYY-MM-DD HH:MM): ")
         fecha_en_espera = validar_fecha(espera_input, "%Y-%m-%d %H:%M")
     
-    prioridad = input_entero("Prioridad (1 = alta, 2 = media, 3 = baja: ") #chequear???
-
     patologia = input("Patología: ").strip()
 
-    nuevo = Receptores(nombre, dni, sexo, nacimiento, grupo_sanguineo, telefono, organo_a_recibir, fecha_en_espera, prioridad, patologia)
+    nuevo = Receptores(nombre, dni, sexo, nacimiento, grupo_sanguineo, telefono, organo_a_recibir, fecha_en_espera, patologia)
 
     # Asignar el centro al receptor
     nuevo.centro_de_salud = centro_de_salud
@@ -352,7 +350,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
         # Buscar en pacientes exitosos
         for paciente in centro.pacientes_exitosos:
             if paciente.DNI == dni_buscado:
-                print(f"✅ TRASPLANTE EXITOSO")
+                print(f" TRASPLANTE EXITOSO")
                 print(f"Paciente: {paciente.nombre}")
                 print(f"DNI: {paciente.DNI}")
                 print(f"Órgano trasplantado: {paciente.organo_a_recibir}")
@@ -362,7 +360,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
         # Buscar en pacientes fallidos
         for paciente in centro.pacientes_fallidos:
             if paciente.DNI == dni_buscado:
-                print(f"❌ TRASPLANTE FALLIDO")
+                print(f" TRASPLANTE FALLIDO")
                 print(f"Paciente: {paciente.nombre}")
                 print(f"DNI: {paciente.DNI}")
                 print(f"Órgano que necesitaba: {paciente.organo_a_recibir}")
@@ -379,7 +377,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
     if receptor_encontrado:
         # Verificar si tiene órganos a disposición
         if hasattr(receptor_encontrado, 'organos_a_disposicion') and receptor_encontrado.organos_a_disposicion:
-            print(f"🔄 RECEPTOR EN PROCESO")
+            print(f" RECEPTOR EN PROCESO")
             print(f"Paciente: {receptor_encontrado.nombre}")
             print(f"DNI: {receptor_encontrado.DNI}")
             print(f"Órgano necesario: {receptor_encontrado.organo_a_recibir}")
@@ -387,7 +385,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
             print(
                 f"Centro de salud: {receptor_encontrado.centro_de_salud.nombre if receptor_encontrado.centro_de_salud else 'No asignado'}")
         else:
-            print(f"⏳ RECEPTOR EN ESPERA")
+            print(f" RECEPTOR EN ESPERA")
             print(f"Paciente: {receptor_encontrado.nombre}")
             print(f"DNI: {receptor_encontrado.DNI}")
             print(f"Órgano necesario: {receptor_encontrado.organo_a_recibir}")
@@ -404,7 +402,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
             break
 
     if donante_encontrado:
-        print(f"🫀 DONANTE REGISTRADO")
+        print(f" DONANTE REGISTRADO")
         print(f"Paciente: {donante_encontrado.nombre}")
         print(f"DNI: {donante_encontrado.DNI}")
         if hasattr(donante_encontrado, 'organos_a_donar') and donante_encontrado.organos_a_donar:
@@ -416,7 +414,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
             f"Centro de salud: {donante_encontrado.centro_de_salud.nombre if donante_encontrado.centro_de_salud else 'No asignado'}")
         return
 
-    print("❌ No se encontró ningún paciente (receptor o donante) con ese DNI.")
+    print(" No se encontró ningún paciente (receptor o donante) con ese DNI.")
 
 
 def procesar_nuevos_trasplantes(incucai: INCUCAI):
@@ -424,7 +422,7 @@ def procesar_nuevos_trasplantes(incucai: INCUCAI):
     Procesa los nuevos pacientes agregados para buscar compatibilidades
     y ejecutar trasplantes pendientes.
     """
-    print("🔄 Procesando nuevos trasplantes...")
+    print(" Procesando nuevos trasplantes...")
 
     # Procesar todos los pacientes en los centros de salud
     pacientes_procesados = 0
@@ -458,9 +456,9 @@ def procesar_nuevos_trasplantes(incucai: INCUCAI):
                         pacientes_procesados += 1
 
     if pacientes_procesados > 0:
-        print(f"✅ Se procesaron {pacientes_procesados} nuevos trasplantes.")
+        print(f" Se procesaron {pacientes_procesados} nuevos trasplantes.")
     else:
-        print("ℹ️ No se encontraron nuevas compatibilidades para procesar.")
+        print(" No se encontraron nuevas compatibilidades para procesar.")
 
 def limpiar_terminal():
     """
