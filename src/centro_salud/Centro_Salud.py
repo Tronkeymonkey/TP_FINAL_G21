@@ -73,34 +73,24 @@ class CentroSalud:
     def asignar_y_mandar_vehiculo(self, receptor : Receptores):
         """
     Asigna y despacha un vehículo adecuado para transportar un órgano hacia el receptor,
-    según la ubicación del paciente en relación con el centro de salud.
+    según la ubicación del paciente en relación con el centro de salud. Una vez encuentra, su disponibilidad es "ocupado".
     
     params:
         - receptor: Objeto de tipo Receptor que representa al paciente que recibirá el órgano.
     
     precon:
-        - El receptor debe ser una instancia válida y no nula.
-        - El receptor debe tener definidos los atributos `partido` y `provincia`.
         - Debe haber al menos un vehículo disponible del tipo adecuado en la lista del centro.
     
     returns:
         El resultado del método `despachar(distancia)` del vehículo seleccionado si se encuentra uno disponible.
         Si no hay vehículos adecuados disponibles o el receptor es inválido, retorna `None`.
     """
-        # Verificar que el receptor no sea None
-        if receptor is None:
-            print("Error: No se puede asignar vehículo, receptor es None")
-            return None
+    #Despues de hacer pruebas, el receptor siempre tendra atributos de partido y provincia y tampoco sera un valor nulo, es por eso que omitimos los ifs para corroborar que dichos casos no ocurran.
 
-        # Verificar que el receptor tenga atributos de ubicación
-        if not hasattr(receptor, 'partido') or not hasattr(receptor, 'provincia'):
-            print(f"Error: El receptor {receptor.nombre} no tiene información de ubicación")
-            return None
-
-        if receptor.partido.__ne__(self.partido):
+        if receptor.partido.__ne__(self.partido): #metodo magico ne (!=)
             distancia = rnd.randint(20, 300)
             for vehiculo in self.lista_vehiculos:
-                if isinstance(vehiculo, Helicoptero) and vehiculo.disponibilidad == "Disponible":
+                if isinstance(vehiculo, Helicoptero) and vehiculo.disponibilidad.__eq__("Disponible"): #metodo magico eq (==) y ademas, utiliza isistance para chequear que los vehiculos de la lista del centro sean del tipo adecuado
                     vehiculo.disponibilidad = "Ocupado"
                     return vehiculo.despachar(distancia)
             print("No hay helicópteros disponibles")
@@ -109,7 +99,7 @@ class CentroSalud:
         elif receptor.provincia.__ne__(self.provincia):
             distancia = rnd.randint(300, 1700)
             for vehiculo in self.lista_vehiculos:
-                if isinstance(vehiculo, Avion) and vehiculo.disponibilidad == "Disponible":
+                if isinstance(vehiculo, Avion) and vehiculo.disponibilidad.__eq__("Disponible"):
                     vehiculo.disponibilidad = "Ocupado"
                     return vehiculo.despachar(distancia)
             print("No hay aviones disponibles")
@@ -118,7 +108,7 @@ class CentroSalud:
         elif receptor.partido.__eq__(self.partido) and receptor.provincia.__eq__(self.provincia):
             distancia = rnd.randint(1, 20)
             autos_disponibles = [vehiculo for vehiculo in self.lista_vehiculos
-                                 if isinstance(vehiculo, Auto) and vehiculo.disponibilidad == "Disponible"]
+                                 if isinstance(vehiculo, Auto) and vehiculo.disponibilidad.__eq__("Disponible")]
 
             if autos_disponibles:
                 auto_mas_rapido = max(autos_disponibles, key=lambda vehiculo: vehiculo.velocidad_viajes)
@@ -183,7 +173,6 @@ class CentroSalud:
         return cirujanos_disponibles[0] if cirujanos_disponibles else None
 
 
-
     def mostrar_estado_cirujanos(self):
         """
         Muestra el estado actual de todos los cirujanos del centro.
@@ -194,9 +183,10 @@ class CentroSalud:
             print(f"{i}. {cirujano}")
         print("-" * 50)
 
+
     def asignar_cirujano_y_operar(self, receptor: Receptores, tiempo):
         """
-    Asigna un cirujano disponible y ejecuta una cirugía de trasplante sobre el receptor.
+    Asigna un cirujano disponible, priorizando al que domine el organo a operar y ejecuta una cirugía de trasplante sobre el receptor.
 
     params:
         - receptor: Instancia de Receptores que representa al paciente que recibirá el órgano.
@@ -204,7 +194,6 @@ class CentroSalud:
 
     precon:
         - `receptor` debe ser una instancia válida y contener el atributo `organo_a_recibir`.
-        - `tiempo` debe ser un valor numérico distinto de None.
         - Debe haber al menos un cirujano disponible en el centro de salud, preferentemente especializado.
 
     returns:
@@ -213,17 +202,8 @@ class CentroSalud:
             - Llama al método `realizar_cirujia()` del cirujano asignado.
             - Agrega al paciente a la lista de `pacientes_exitosos` o `pacientes_fallidos` según el resultado.
     """
-        #Verificar que los parámetros no sean None
-        if receptor is None:
-            print("Error: No se puede operar, receptor es None")
-            return
 
-        if tiempo is None:
-            print("Error: No se puede operar, tiempo es None")
-            return
-
-        #Buscar el mejor cirujano disponible para el órgano específico
-        cirujano_asignado = self.obtener_mejor_cirujano_para_organo(receptor.organo_a_recibir)
+        cirujano_asignado = self.obtener_mejor_cirujano_para_organo(receptor.organo_a_recibir) #la funcion puede retornar al mejor cirujano o al disponible, por eso se la llama
 
         if cirujano_asignado is None:
             print(f" No hay cirujanos disponibles en {self.nombre}")
