@@ -156,7 +156,7 @@ class CentroSalud:
         Prioriza especialistas sobre cirujanos generales para mejorar las probabilidades de éxito.
         Marca al cirujano como "Ocupado" y ejecuta el método `realizar_cirujia`.
         """
-        # FIX: Verificar que los parámetros no sean None
+        #Verificar que los parámetros no sean None
         if receptor is None:
             print("Error: No se puede operar, receptor es None")
             return
