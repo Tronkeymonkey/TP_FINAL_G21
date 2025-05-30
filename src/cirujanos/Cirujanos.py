@@ -152,7 +152,7 @@ class Cirujanos:
             #El cirujano general siempre tiene 50% de éxito independientemente del órgano
             if especialidad_cirujano == "general":
                 exito = rnd.randint(1, 10)
-                if exito >= 5:  # 50% de probabilidad para cirujano general
+                if exito >= 5: 
                     print(f" Cirugía EXITOSA (cirujano general): {receptor.nombre} - {organo_necesario}")
                     return True
                 else:
@@ -161,8 +161,8 @@ class Cirujanos:
 
             # Para cirujanos especialistas
             elif organo_necesario in self.tabla_sinergias.get(especialidad_cirujano, []):
-                # Cirugía compatible: mayor probabilidad de éxito (70%)
-                exito = rnd.randint(1, 10)  #Cambiar rango de 1-10 para que 3+ sea 70%
+                
+                exito = rnd.randint(1, 10)  
                 if exito >= 3:
                     print(
                         f" Cirugía EXITOSA: {receptor.nombre} - {organo_necesario} por especialista en {especialidad_cirujano}")
@@ -173,9 +173,9 @@ class Cirujanos:
                     return False
 
             else:
-                # Cirugía no compatible: menor probabilidad de éxito (50%)
+                # Cirugía no compatible
                 exito = rnd.randint(1, 10)
-                if exito >= 5:  #50% de probabilidad
+                if exito >= 5:  
                     print(
                         f" Cirugía EXITOSA (no especialista): {receptor.nombre} - {organo_necesario} por {especialidad_cirujano}")
                     return True
@@ -184,7 +184,7 @@ class Cirujanos:
                         f" Cirugía FALLIDA (no especialista): {receptor.nombre} - {organo_necesario} por {especialidad_cirujano}")
                     return False
 
-        #Caso por defecto (no debería llegar aquí, pero por seguridad)
+        #Caso por defecto (no debería llegar aca, pero por seguridad)
         return False
 
     def __str__(self):

@@ -26,7 +26,7 @@ class INCUCAI:
     def clasificar_centros_salud(self):
         
         """
-        Procesa todos los pacientes registrados en los centros de salud.
+        INCUCAI procesa todos los pacientes registrados en los centros de salud.
         Clasifica a cada paciente como receptor o donante, los agrega a sus respectivas listas
         y gestiona todo el proceso de búsqueda de compatibilidad, asignación de vehículo,
         y ejecución de la cirugía por parte del centro de salud.
@@ -35,14 +35,15 @@ class INCUCAI:
             for paciente in centro.lista_pacientes:
                 if isinstance(paciente, Receptores): #verificar si es receptor o donante en base a la clase
                     self.lista_receptores.append(paciente)
-                    if self.buscar_compatibilidad_receptor_a_donante(paciente): #busca compatibilidad entre el receptor y los donantes
-                        tiempo = centro.asignar_y_mandar_vehiculo(paciente)
-                        centro.asignar_cirujano_y_operar(paciente, tiempo)
+                    if self.buscar_compatibilidad_receptor_a_donante(paciente): 
+                        tiempo = centro.asignar_y_mandar_vehiculo(paciente) 
+                        if tiempo is not None:
+                            centro.asignar_cirujano_y_operar(paciente, tiempo)
 
-                elif isinstance(paciente, Donantes):
+                elif isinstance(paciente, Donantes): #misma logica que los receptores, pero aplicado a los donantes
                     self.lista_donantes.append(paciente)
-                    receptor_encontrado = self.buscar_compatibilidad_donante_a_receptor(paciente)
-                    if receptor_encontrado is not None:
+                    receptor_encontrado = self.buscar_compatibilidad_donante_a_receptor(paciente)  #como los organos del donante son los que van al receptor, esta funcion devuelve dicho receptor encontrado que necesita del organo
+                    if receptor_encontrado is not None: #si encuentra un receptor, entra a las demas funciones
                         tiempo = centro.asignar_y_mandar_vehiculo(receptor_encontrado)
                         if tiempo is not None:
                             centro.asignar_cirujano_y_operar(receptor_encontrado, tiempo)
@@ -68,18 +69,18 @@ class INCUCAI:
             #Usar estado por defecto si no está definido
             estado_receptor = getattr(receptor, 'estado', 'estable').lower()
 
-            if estado_receptor == "inestable":
+            if estado_receptor == "inestable": #la jerarquia de busqueda de pacientes se da primero en inestables, si bien las listas se ordenan ademas de mas joven a mas viejo, es evidente que primero tiene que haber un match mas alla de la edad
                 for donante in self.lista_donantes:
                     #Comparar correctamente con los órganos del donante
                     for organo in donante.organos_a_donar:
                         if (receptor.organo_a_recibir.lower() == organo.tipo_de_organo.lower() and
                                 receptor.Tsangre == donante.Tsangre):
-                            organo.fecha_ablacion = datetime.now()
-                            receptor.organos_a_disposicion.append(organo)
-                            donante.organos_a_donar.remove(organo)
-                            return True
+                            organo.fecha_ablacion = datetime.now() # setea en "0hs" la fecha de ablacion del organo
+                            receptor.organos_a_disposicion.append(organo) 
+                            donante.organos_a_donar.remove(organo) 
+                            return True 
 
-            else:  # estado estable
+            else:  
                 for donante in self.lista_donantes:
                     for organo in donante.organos_a_donar[:]:  # Crear copia para iterar seguro
                         if (receptor.organo_a_recibir.lower() == organo.tipo_de_organo.lower() and
@@ -106,22 +107,21 @@ class INCUCAI:
         - El objeto Receptores compatible que recibió un órgano del donante.
         - None si no se encontró ningún receptor compatible.
             """
+            #segun la consigna, el matcheo es distinto si ingresa un receptor o un donante
             for receptor in self.lista_receptores:
                 #Iterar sobre una copia de la lista para evitar modificar durante iteración
                 for organo in donante.organos_a_donar[:]:
                     if (organo.tipo_de_organo.lower().__eq__(receptor.organo_a_recibir.lower()) and
                             donante.Tsangre.__eq__(receptor.Tsangre)): #metodo magico eq (==)
-                        organo.fecha_ablacion = datetime.now()
+                        organo.fecha_ablacion = datetime.now() 
                         receptor.organos_a_disposicion.append(organo)
                         donante.organos_a_donar.remove(organo)
 
-                        # Si el donante se queda sin órganos, removerlo de la lista
                         if not donante.organos_a_donar:
                             if donante in self.lista_donantes:
                                 self.lista_donantes.remove(donante)
 
                         return receptor
 
-                #Retornar None explícitamente si no se encuentra compatibilidad
             return None
 
