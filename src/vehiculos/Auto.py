@@ -38,7 +38,7 @@ class Auto(Vehiculos):
             
             if self.velocidad_viajes == 0:
                 raise ValueError("La velocidad del vehículo no puede ser cero.")
-            tiempo = (distancia / self.velocidad_viajes).__add__(nivel_trafico)
+            tiempo = (distancia / self.velocidad_viajes) +nivel_trafico
             self.registro_viajes.append({
                 'distancia': distancia,
                 'nivel_trafico': nivel_trafico,
