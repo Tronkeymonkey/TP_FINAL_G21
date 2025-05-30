@@ -8,12 +8,22 @@ class Cirujanos:
 
     def __init__(self, especialidad):
         """
-        Constructor de la clase Cirujanos.
-        Recibe como argumento la especialidad del cirujano
-        La disponibilidad se setea por defecto como 'Disponible'. También se inicializa una tabla de sinergias,
-        que define qué especialidades están capacitadas para operar qué órganos.
-        Se agrega control de tiempo para disponibilidad post-cirugía.
-        """
+    Constructor de la clase Cirujanos.
+    
+    params:
+        - especialidad: La especialidad médica del cirujano (por ejemplo, 'cardiovascular', 'plastico', etc.).
+    
+    precon:
+        La especialidad debe estar en minúsculas o será convertida automáticamente. Se espera que coincida con alguna clave de la tabla de sinergias.
+    
+    returns:
+        No retorna nada directamente. Inicializa los atributos del objeto:
+            - self.especialidad: almacena la especialidad en minúsculas.
+            - self.disponibilidad: se setea como 'Disponible' por defecto.
+            - self.ultima_cirugia: inicia como None y almacenará la última fecha de cirugía.
+            - self.tiempo_recuperacion: valor fijo en horas (24) para volver a estar disponible.
+            - self.tabla_sinergias: diccionario que indica qué especialidades pueden operar qué órganos.
+    """
         self.especialidad = especialidad.lower()
         self.disponibilidad = "Disponible"
         self.ultima_cirugia = None  #Almacena la fecha/hora de la última cirugía
@@ -31,8 +41,20 @@ class Cirujanos:
 
     def verificar_disponibilidad(self):
         """
-        Verifica si el cirujano está disponible basándose en el tiempo transcurrido
-        desde su última cirugía. Si han pasado 24 horas o más, actualiza su estado a "Disponible".
+        Verifica si el cirujano está disponible para operar, basándose en el tiempo transcurrido
+    desde su última cirugía.
+
+    params:
+        - self: instancia actual del objeto Cirujano.
+
+    precon:
+        self.ultima_cirugia debe ser None o un objeto datetime válido.
+        self.tiempo_recuperacion debe estar definido (en horas).
+
+    returns:
+        True si el cirujano está disponible (han pasado 24 horas o más desde la última cirugía,
+        o aún no ha realizado ninguna); False en caso contrario. También actualiza el estado
+        de disponibilidad internamente a "Disponible" u "Ocupado" según corresponda.
         """
         if self.ultima_cirugia is None:
             self.disponibilidad = "Disponible"
@@ -52,8 +74,20 @@ class Cirujanos:
 
     def tiempo_restante_recuperacion(self):
         """
-        Devuelve las horas restantes hasta que el cirujano esté disponible.
-        Retorna 0 si ya está disponible.
+    Calcula y devuelve la cantidad de horas restantes para que el cirujano
+    vuelva a estar disponible.
+
+    params:
+        - self: instancia actual del objeto Cirujano.
+
+    precon:
+        self.ultima_cirugia debe ser None o un objeto datetime válido.
+        self.tiempo_recuperacion debe estar definido (en horas).
+
+    returns:
+        Un número flotante representando las horas restantes hasta que el cirujano
+        esté disponible. Si ya está disponible (o no ha operado nunca), retorna 0.
+        El valor retornado se redondea a un decimal.
         """
         if self.ultima_cirugia is None:
             return 0
@@ -69,12 +103,21 @@ class Cirujanos:
 
     def realizar_cirujia(self, tiempo, receptor: Receptores):
         """
-        Simula el proceso de una cirujia y determina el exito de esta. El parametro tiempo es la diferencia entre
-        la hora actual y la hora de ablacion del organo. El parametro receptor, es el receptor que necesita el transplante.
-        Si el organo ha pasado mas de 20hs desde la ablación, la cirujia se cancela automaticamente. Si el organo es compatible con la especialidad
-        del cirujano, la probabilidad de exito es mayor, pero si no es compatible, la cirujia puede seguir adelante pero con menor probabilidad de exito.
-        El cirujano estará ocupado por 24 horas después de la operación.
-        Devuelve True si la cirujia fue exitosa. False si la cirujia falló. Y muestra un mensaje si el tiempo de ablacion supera las 20hs.
+        Simula el proceso de una cirugía y determina su éxito.
+
+    params:
+        - tiempo: Diferencia en horas entre la hora actual y la hora de ablación del órgano.
+        - receptor: Objeto Receptores que representa al paciente que necesita el trasplante.
+
+    precon:
+        - El cirujano debe estar disponible para realizar la cirugía.
+        - El tiempo debe ser un valor numérico positivo.
+        - El receptor no debe ser None.
+        - Si el tiempo de ablación supera las 20 horas, la cirugía se cancela automáticamente.
+
+    returns:
+        - True si la cirugía fue exitosa.
+        - False si la cirugía falló o fue cancelada (por disponibilidad, receptor None o tiempo excedido).
         """
         #Verificar disponibilidad basada en tiempo
         if not self.verificar_disponibilidad():

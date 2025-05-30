@@ -8,8 +8,16 @@ class INCUCAI:
 
     def __init__(self, centros = []):
         """
-        Inicializa una instancia de INCUCAI con una lista de centros de salud proporcionada.
-        Además, crea listas vacías para almacenar receptores y donantes.
+    Inicializa una instancia de INCUCAI.
+
+    params:
+        - centros: Una lista de objetos CentroSalud que representa los centros de salud asociados.
+    
+    precon (opcional):
+        - centros debe ser una lista (puede estar vacía) cuyos elementos sean instancias de CentroSalud.
+    
+    returns:
+        None. Este método inicializa los atributos de la instancia.
         """
         self.lista_receptores: list[Receptores] = [] #listas para almacenar los receptores y donantes (vacias) 
         self.lista_donantes: list[Donantes] = []
@@ -44,11 +52,18 @@ class INCUCAI:
 
     def buscar_compatibilidad_receptor_a_donante(self, receptor: Receptores):  # Verificar si el órgano que el receptor necesita está en la lista de órganos que el donante puede donar    
             """
-            Busca donantes compatibles para un receptor dado.
-            Si el receptor está en estado 'inestable', se le da prioridad.
-            Si encuentra un donante con el órgano requerido y tipo de sangre compatible,
-            transfiere el órgano al receptor, registra la fecha de ablación y lo elimina
-            de la lista de órganos del donante.
+            Busca donantes compatibles para un receptor dado y realiza la transferencia del órgano si es posible.
+
+    params:
+        - receptor: Un objeto Receptores que contiene la información del receptor que necesita un órgano.
+    
+    precon (opcional):
+        - receptor debe tener los atributos 'organo_a_recibir' (str) y 'Tsangre' (tipo de sangre).
+        - Los donantes en self.lista_donantes deben tener una lista 'organos_a_donar' con órganos disponibles.
+    
+    returns:
+        - True si se encontró un donante compatible y se realizó la transferencia del órgano.
+        - False si no se encontró ningún donante compatible.
             """
             #Usar estado por defecto si no está definido
             estado_receptor = getattr(receptor, 'estado', 'estable').lower()
@@ -77,21 +92,25 @@ class INCUCAI:
             return False
 
     def buscar_compatibilidad_donante_a_receptor(self, donante: Donantes) -> Receptores:
-            #verifico si el donante es compatible con el receptor
-            #logica exactamente igual a la del receptor, pero sin incluir la prioridad del estado
             """
-            Busca receptores compatibles para un donante dado.
-            Compara los órganos disponibles del donante con lo que necesitan los receptores
-            y también verifica el tipo de sangre.
-            Si hay compatibilidad, transfiere los órganos, registra la fecha de ablación,
-            los elimina de la lista del donante y remueve al donante si ya no tiene órganos.
-            Retorna el receptor compatible encontrado.
+            Busca receptores compatibles para un donante dado y realiza la transferencia del órgano si es posible.
+
+    params:
+        - donante: Un objeto Donantes que contiene la información del donante y los órganos disponibles para donar.
+
+    precon (opcional):
+        - donante debe tener una lista 'organos_a_donar' con órganos disponibles.
+        - Los receptores en self.lista_receptores deben tener los atributos 'organo_a_recibir' (str) y 'Tsangre'.
+
+    returns:
+        - El objeto Receptores compatible que recibió un órgano del donante.
+        - None si no se encontró ningún receptor compatible.
             """
             for receptor in self.lista_receptores:
                 #Iterar sobre una copia de la lista para evitar modificar durante iteración
                 for organo in donante.organos_a_donar[:]:
-                    if (organo.tipo_de_organo.lower() == receptor.organo_a_recibir.lower() and
-                            donante.Tsangre == receptor.Tsangre):
+                    if (organo.tipo_de_organo.lower().__eq__(receptor.organo_a_recibir.lower()) and
+                            donante.Tsangre.__eq__(receptor.Tsangre)): #metodo magico eq (==)
                         organo.fecha_ablacion = datetime.now()
                         receptor.organos_a_disposicion.append(organo)
                         donante.organos_a_donar.remove(organo)
