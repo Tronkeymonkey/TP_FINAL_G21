@@ -111,34 +111,6 @@ class CentroSalud:
                 cirujanos_disponibles.append(cirujano)
         return cirujanos_disponibles
 
-    def obtener_mejor_cirujano_para_organo(self, organo_necesario):
-        """
-        Busca el mejor cirujano disponible para un órgano específico.
-        Prioriza especialistas sobre cirujanos generales.
-        """
-        cirujanos_disponibles = self.obtener_cirujanos_disponibles()
-
-        if not cirujanos_disponibles:
-            return None
-
-        organo_necesario = organo_necesario.lower()
-
-        # Primero buscar especialistas compatibles
-        for cirujano in cirujanos_disponibles:
-            especialidad = cirujano.especialidad.lower()
-            if especialidad != "general":  # No es general
-                organos_compatibles = cirujano.get_organos_compatibles()
-                if organo_necesario in organos_compatibles:
-                    return cirujano  # Encontrado especialista compatible
-
-        # Si no hay especialistas, buscar cirujano general
-        for cirujano in cirujanos_disponibles:
-            if cirujano.especialidad.lower() == "general":
-                return cirujano
-
-        # Si no hay generales, devolver cualquier cirujano disponible
-        return cirujanos_disponibles[0] if cirujanos_disponibles else None
-
     def mostrar_estado_cirujanos(self):
         """
         Muestra el estado actual de todos los cirujanos del centro.
