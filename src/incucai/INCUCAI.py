@@ -1,6 +1,5 @@
 from pacientes.Receptores import Receptores
 from pacientes.Donantes import Donantes
-from cirujanos.Cirujanos import Cirujanos
 from centro_salud.Centro_Salud import CentroSalud
 from organos.Organos import *
 from datetime import datetime

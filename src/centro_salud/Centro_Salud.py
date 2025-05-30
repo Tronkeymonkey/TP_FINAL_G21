@@ -4,7 +4,6 @@ from vehiculos.Auto import *
 from pacientes.Receptores import Receptores
 from cirujanos.Cirujanos import Cirujanos
 from pacientes.Donantes import Donantes
-from pacientes.Pacientes import Pacientes
 import random as rnd 
 
 class CentroSalud:

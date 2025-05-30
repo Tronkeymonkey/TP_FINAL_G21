@@ -54,7 +54,7 @@ class Vehiculos(ABC):
     returns:
         Tiempo estimado de viaje calculado como distancia dividida por la velocidad del vehículo.
         """
-        tiempo = distancia.__truediv__(self.velocidad_viajes) #metodo magico truediv (/)
+        tiempo = distancia / self.velocidad_viajes
         self.registro_viajes.append({
         'distancia': distancia,
         'nivel_trafico': nivel_trafico,
