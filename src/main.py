@@ -8,7 +8,7 @@ from centro_salud.Centro_Salud import CentroSalud
 from cirujanos.Cirujanos import Cirujanos
 from pacientes.Donantes import Donantes
 import datetime
-from menu import *
+from src.menu import *
 
 cirujanos = [Cirujanos("Cardiovascular"),
              Cirujanos("Gastroenterologo"),
