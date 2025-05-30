@@ -58,10 +58,11 @@ pacientes = [
     Receptores("Emilia Gómez", 30123456, "F", datetime.datetime.strptime("1988-06-03", "%Y-%m-%d"), "AB+", 341456789, "higado", datetime.datetime.strptime("2023-07-10", "%Y-%m-%d"), 1, "Diabetes tipo 1"),
 ]
 
-centros_salud[0].asignar_pacientes([pacientes[0], pacientes[4]])
+centros_salud[0].asignar_pacientes([pacientes[0], pacientes[4], pacientes[13]])
 centros_salud[1].asignar_pacientes([pacientes[1], pacientes[2], pacientes[3]])
 centros_salud[2].asignar_pacientes([pacientes[5], pacientes[6], pacientes[7], pacientes[8], pacientes[9]])
-centros_salud[3].asignar_pacientes([pacientes[10], pacientes[11], pacientes[12], pacientes[13]])
+centros_salud[3].asignar_pacientes([pacientes[10], pacientes[11], pacientes[12]])
+
 
 incucai = INCUCAI(centros_salud)
 
