@@ -47,9 +47,8 @@ class CentroSalud:
             paciente.partido = self.partido
             paciente.provincia = self.provincia
 
-        
-#La logica es que el centro es el del donante
 
+ #La logica es que el centro es el del donante
     def asignar_y_mandar_vehiculo(self, receptor : Receptores):
         """
         Determina qué tipo de vehículo utilizar para transportar un órgano, 
