@@ -7,6 +7,20 @@ import os
 
 # --------- Funciones para el menu ---------
 def validar_fecha(fecha_str, formato="%Y-%m-%d", anios_max=100):
+    """
+    Valida si una fecha ingresada como string está dentro de un rango lógico.
+
+    params:
+        - fecha_str: Fecha en formato string, se espera 'Año-Mes-Día' u otro formato definido.
+        - formato: El formato esperado de la fecha (por defecto "%Y-%m-%d").
+        - anios_max: Cantidad máxima de años hacia atrás desde hoy que se consideran válidos (por defecto 100).
+
+    precon:
+        La fecha debe seguir el formato especificado y encontrarse dentro de los últimos `anios_max` años.
+
+    returns:
+        Un objeto datetime correspondiente a la fecha válida, o None si la fecha es inválida.
+    """
     try:
         fecha = datetime.datetime.strptime(fecha_str, formato)
         hoy = datetime.datetime.now()
@@ -20,12 +34,34 @@ def validar_fecha(fecha_str, formato="%Y-%m-%d", anios_max=100):
     return None
 
 def obtener_centro_salud(incucai: INCUCAI, nombre_centro: str):
+    """
+    Busca un centro de salud en la lista de centros de INCUCAI por nombre.
+
+    params:
+        - incucai: Objeto que contiene una lista de centros de salud (se asume que tiene el atributo `centros_salud`).
+        - nombre_centro: Nombre del centro de salud a buscar.
+
+    precon:
+        El nombre debe coincidir (ignorando espacios y mayúsculas) con alguno de los nombres de los centros de salud del INCUCAI.
+
+    returns:
+        El objeto centro de salud si se encuentra, o None en caso contrario.
+    """
     for centro in incucai.centros_salud:
         if centro.nombre.strip().lower() == nombre_centro.strip().lower():
             return centro
     return None
 
 def input_entero(mensaje):
+    """
+    Solicita al usuario un número entero por consola, repitiendo hasta que se ingrese uno válido.
+
+    params:
+        - mensaje: Texto que se mostrará al usuario para solicitar el número.
+
+    returns:
+        El número entero ingresado por el usuario.
+    """
     while True:
         try:
             return int(input(mensaje))
@@ -33,17 +69,72 @@ def input_entero(mensaje):
             print("Debe ingresar un número válido.")
 
 def dni_donante_ya_existe(incucai: INCUCAI, dni: int) -> bool:
+    """
+    Verifica si un donante con el DNI dado ya está registrado en la base de datos de INCUCAI.
+
+    params:
+        - incucai: Objeto que contiene la lista de donantes (se asume que tiene `lista_donantes`).
+        - dni: Número de Documento Nacional de Identidad del donante a verificar.
+
+    precon:
+        `lista_donantes` debe estar correctamente poblada con objetos que tengan el atributo `DNI`.
+
+    returns:
+        True si existe un donante con el DNI especificado, False en caso contrario.
+    """
     return any(d.DNI == dni for d in incucai.lista_donantes)
 
 def dni_receptor_ya_existe(incucai: INCUCAI, dni: int) -> bool:
+    """
+    Verifica si un receptor con el DNI dado ya está registrado en la base de datos de INCUCAI.
+
+    params:
+        - incucai: Objeto que contiene la lista de receptores (se asume que tiene `lista_receptores`).
+        - dni: Número de Documento Nacional de Identidad del receptor a verificar.
+
+    precon:
+        `lista_receptores` debe estar correctamente poblada con objetos que tengan el atributo `DNI`.
+
+    returns:
+        True si existe un receptor con el DNI especificado, False en caso contrario.
+    """
     return any(r.DNI == dni for r in incucai.lista_receptores)
 
 def calcular_edad(nacimiento: datetime.datetime) -> int:
+    """
+    Calcula la edad actual en años a partir de una fecha de nacimiento.
+
+    params:
+        - nacimiento: Fecha de nacimiento como objeto datetime.
+
+    precon:
+        La fecha de nacimiento debe ser anterior a la fecha actual.
+
+    returns:
+        La edad de la persona en años completos.
+    """
     hoy = datetime.datetime.now()
     return hoy.year - nacimiento.year - ((hoy.month, hoy.day) < (nacimiento.month, nacimiento.day))
 
 
 def listas_receptores_por_centro(incucai: INCUCAI):
+    """
+    Muestra una lista de receptores registrados en un centro de salud específico, ordenados por prioridad médica y edad.
+
+    params:
+        - incucai: Objeto que contiene la lista de receptores y centros de salud registrados.
+
+    precon:
+        - Deben existir centros de salud y receptores registrados en el sistema.
+        - Los receptores deben tener atributos como `estado`, `nacimiento`, `nombre`, `organo_a_recibir`, `Tsangre`, `partido`, y `provincia`.
+        - Cada receptor debe estar vinculado a un centro de salud con un atributo `nombre`.
+
+    returns:
+        No retorna ningún valor. Imprime por consola la lista de receptores del centro ingresado, separados por su estado clínico:
+            - Receptores inestables (prioridad crítica), ordenados por edad ascendente.
+            - Receptores estables, también ordenados por edad ascendente.
+        Si no hay coincidencias o datos suficientes, imprime mensajes adecuados.
+    """
     print("\n---- LISTA RECEPTORES POR CENTRO DE SALUD -----")
 
     if not incucai.centros_salud:
@@ -85,7 +176,7 @@ def listas_receptores_por_centro(incucai: INCUCAI):
 
     # Mostrar receptores inestables
     if inestables:
-        print(f"\n🚨 RECEPTORES INESTABLES (PRIORIDAD CRÍTICA):")
+        print(f"\n RECEPTORES INESTABLES (PRIORIDAD CRÍTICA):")
         print("-" * 50)
         for i in inestables:
             print(
@@ -94,7 +185,7 @@ def listas_receptores_por_centro(incucai: INCUCAI):
 
     # Mostrar receptores estables
     if estables:
-        print(f"\n📋 RECEPTORES ESTABLES:")
+        print(f"\n RECEPTORES ESTABLES:")
         print("-" * 30)
         for i in estables:
             print(
@@ -105,6 +196,21 @@ def listas_receptores_por_centro(incucai: INCUCAI):
         print("No hay receptores para mostrar.")
         
 def listas_donantes(incucai:INCUCAI):
+    """
+    Muestra por consola la lista de donantes registrados en el sistema, junto con su grupo sanguíneo, centro de salud
+    y órganos disponibles para donar (si los tiene registrados).
+
+    params:
+        - incucai: Objeto que contiene la lista de donantes registrados en `lista_donantes`.
+
+    precon:
+        - Cada donante debe tener los atributos `nombre`, `Tsangre` y una posible referencia a `centro_de_salud`.
+        - El atributo `organos_a_donar` (si está presente) debe ser una lista de objetos que tengan el atributo `tipo_de_organo`.
+
+    returns:
+        No retorna ningún valor. Imprime por consola los datos de cada donante, incluyendo su centro de salud (si tiene)
+        y los órganos que tiene disponibles para donar (si están registrados).
+    """
     print("\n----- LISTA DONANTES ----")
     for idx, i in enumerate(incucai.lista_donantes):
         centro_nombre = i.centro_de_salud.nombre if i.centro_de_salud else "Sin asignar"
@@ -117,12 +223,44 @@ def listas_donantes(incucai:INCUCAI):
         print()  # Línea en blanco para mejor legibilidad
         
 def listas_centros_salud(incucai: INCUCAI):
+    """
+    Muestra por consola la lista de todos los centros de salud registrados en el sistema, con información básica.
+
+    params:
+        - incucai: Objeto que contiene la lista de centros de salud registrados en `centros_salud`.
+
+    precon:
+        - Cada centro de salud debe tener los atributos `nombre`, `partido`, `provincia` y `telefono`.
+
+    returns:
+        No retorna ningún valor. Imprime por consola los datos de cada centro de salud registrado.
+    """
     print("\n ---- CENTROS DE SALUD ----")
     for i in incucai.centros_salud:
         print(f" Nombre: {i.nombre} - Partido: {i.partido} - Provincia: {i.provincia} - Tel: {i.telefono} ") 
 
       
 def agregar_receptor(incucai: INCUCAI):
+    """
+    Carga manualmente un nuevo receptor al sistema a través de inputs interactivos con el usuario.
+
+    params:
+        - incucai: Objeto que contiene listas de donantes, receptores y centros de salud.
+
+    precon:
+        - El DNI ingresado debe ser único (no debe estar registrado como donante ni como receptor).
+        - El nombre no debe contener números ni estar vacío.
+        - El sexo debe ser 'M' o 'F'.
+        - La fecha de nacimiento debe ser válida y tener sentido lógico (por ejemplo, no futura).
+        - El grupo sanguíneo debe estar dentro de los tipos válidos.
+        - El centro de salud debe estar registrado previamente.
+        - El órgano solicitado debe estar entre los definidos como válidos.
+        - La fecha de espera debe ser válida y tener el formato correcto.
+
+    returns:
+        No retorna ningún valor. Agrega el nuevo receptor al sistema y al centro de salud correspondiente.
+        Imprime un mensaje confirmando la operación.
+    """
     print("\n CARGAR NUEVO RECEPTOR")
     
     # Solicitar DNI primero
@@ -202,11 +340,9 @@ def agregar_receptor(incucai: INCUCAI):
         espera_input = input("Fecha de espera (YYYY-MM-DD HH:MM): ")
         fecha_en_espera = validar_fecha(espera_input, "%Y-%m-%d %H:%M")
     
-    prioridad = input_entero("Prioridad (1 = alta, 2 = media, 3 = baja: ") #chequear???
-
     patologia = input("Patología: ").strip()
 
-    nuevo = Receptores(nombre, dni, sexo, nacimiento, grupo_sanguineo, telefono, organo_a_recibir, fecha_en_espera, prioridad, patologia)
+    nuevo = Receptores(nombre, dni, sexo, nacimiento, grupo_sanguineo, telefono, organo_a_recibir, fecha_en_espera, patologia)
 
     # Asignar el centro al receptor
     nuevo.centro_de_salud = centro_de_salud
@@ -219,6 +355,27 @@ def agregar_receptor(incucai: INCUCAI):
 
 
 def agregar_donante(incucai: INCUCAI):
+    """
+    Carga manualmente un nuevo donante al sistema a través de inputs interactivos con el usuario.
+
+    params:
+        - incucai: Objeto principal que contiene las listas de donantes, receptores y centros de salud.
+
+    precon:
+        - El DNI ingresado debe tener exactamente 8 dígitos y debe ser único (no debe estar registrado como donante ni como receptor).
+        - El nombre no debe contener números ni estar vacío.
+        - El sexo debe ser 'M' o 'F'.
+        - La fecha de nacimiento debe tener el formato YYYY-MM-DD y ser válida.
+        - El grupo sanguíneo debe pertenecer a los valores aceptados: A+, A-, B+, B-, AB+, AB-, O+, O-.
+        - El teléfono debe ser numérico.
+        - El centro de salud debe existir previamente en el sistema.
+        - La fecha y hora de fallecimiento debe ser válida y tener el formato YYYY-MM-DD HH:MM.
+        - El donante debe registrar al menos un órgano válido de la lista permitida.
+
+    returns:
+        No retorna ningún valor. Agrega el nuevo donante al sistema y al centro de salud correspondiente.
+        Imprime un mensaje confirmando el alta y muestra los órganos a donar registrados.
+    """
     print("\nCARGAR NUEVO DONANTE:")
 
     # Bucle nombre
@@ -338,8 +495,33 @@ def agregar_donante(incucai: INCUCAI):
 
 def consultar_resultado_trasplante(incucai: INCUCAI):
     """
-    Busca el resultado de trasplante para un paciente (receptor o donante) por DNI.
-    Muestra información detallada sobre el estado del trasplante.
+    Consulta el estado actual de un paciente en el sistema de trasplantes mediante su DNI.
+
+    Esta función permite al usuario buscar e identificar el estado de trasplante de un paciente,
+    ya sea como receptor o donante, y muestra los detalles correspondientes al centro de salud,
+    estado del trasplante y órganos involucrados.
+
+    params:
+        - incucai: Objeto del sistema INCUCAI que contiene listas de centros de salud,
+          donantes y receptores.
+
+    precon:
+        - El usuario debe ingresar un DNI válido (numérico).
+        - El paciente puede encontrarse en alguna de las siguientes categorías:
+            a) Trasplante exitoso
+            b) Trasplante fallido
+            c) Receptor en proceso
+            d) Receptor en espera
+            e) Donante registrado
+        - Si no se encuentra al paciente, se informará que no existe registro con ese DNI.
+
+    returns:
+        No retorna ningún valor. Imprime en consola el estado actual del trasplante según el paciente:
+        - Nombre del paciente
+        - DNI
+        - Órgano involucrado
+        - Centro de salud correspondiente
+        - Estado actual del procedimiento (exitoso, fallido, en espera, etc.)
     """
     try:
         dni_buscado = int(input("Ingrese el DNI del paciente: "))
@@ -352,7 +534,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
         # Buscar en pacientes exitosos
         for paciente in centro.pacientes_exitosos:
             if paciente.DNI == dni_buscado:
-                print(f"✅ TRASPLANTE EXITOSO")
+                print(f" TRASPLANTE EXITOSO")
                 print(f"Paciente: {paciente.nombre}")
                 print(f"DNI: {paciente.DNI}")
                 print(f"Órgano trasplantado: {paciente.organo_a_recibir}")
@@ -362,7 +544,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
         # Buscar en pacientes fallidos
         for paciente in centro.pacientes_fallidos:
             if paciente.DNI == dni_buscado:
-                print(f"❌ TRASPLANTE FALLIDO")
+                print(f" TRASPLANTE FALLIDO")
                 print(f"Paciente: {paciente.nombre}")
                 print(f"DNI: {paciente.DNI}")
                 print(f"Órgano que necesitaba: {paciente.organo_a_recibir}")
@@ -379,7 +561,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
     if receptor_encontrado:
         # Verificar si tiene órganos a disposición
         if hasattr(receptor_encontrado, 'organos_a_disposicion') and receptor_encontrado.organos_a_disposicion:
-            print(f"🔄 RECEPTOR EN PROCESO")
+            print(f" RECEPTOR EN PROCESO")
             print(f"Paciente: {receptor_encontrado.nombre}")
             print(f"DNI: {receptor_encontrado.DNI}")
             print(f"Órgano necesario: {receptor_encontrado.organo_a_recibir}")
@@ -387,7 +569,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
             print(
                 f"Centro de salud: {receptor_encontrado.centro_de_salud.nombre if receptor_encontrado.centro_de_salud else 'No asignado'}")
         else:
-            print(f"⏳ RECEPTOR EN ESPERA")
+            print(f" RECEPTOR EN ESPERA")
             print(f"Paciente: {receptor_encontrado.nombre}")
             print(f"DNI: {receptor_encontrado.DNI}")
             print(f"Órgano necesario: {receptor_encontrado.organo_a_recibir}")
@@ -404,7 +586,7 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
             break
 
     if donante_encontrado:
-        print(f"🫀 DONANTE REGISTRADO")
+        print(f" DONANTE REGISTRADO")
         print(f"Paciente: {donante_encontrado.nombre}")
         print(f"DNI: {donante_encontrado.DNI}")
         if hasattr(donante_encontrado, 'organos_a_donar') and donante_encontrado.organos_a_donar:
@@ -416,15 +598,40 @@ def consultar_resultado_trasplante(incucai: INCUCAI):
             f"Centro de salud: {donante_encontrado.centro_de_salud.nombre if donante_encontrado.centro_de_salud else 'No asignado'}")
         return
 
-    print("❌ No se encontró ningún paciente (receptor o donante) con ese DNI.")
+    print(" No se encontró ningún paciente (receptor o donante) con ese DNI.")
 
 
 def procesar_nuevos_trasplantes(incucai: INCUCAI):
     """
-    Procesa los nuevos pacientes agregados para buscar compatibilidades
-    y ejecutar trasplantes pendientes.
+    Consulta el estado actual de un paciente en el sistema de trasplantes mediante su DNI.
+
+    Esta función permite al usuario buscar e identificar el estado de trasplante de un paciente,
+    ya sea como receptor o donante, y muestra los detalles correspondientes al centro de salud,
+    estado del trasplante y órganos involucrados.
+
+    params:
+        - incucai: Objeto del sistema INCUCAI que contiene listas de centros de salud,
+          donantes y receptores.
+
+    precon:
+        - El usuario debe ingresar un DNI válido (numérico).
+        - El paciente puede encontrarse en alguna de las siguientes categorías:
+            a) Trasplante exitoso
+            b) Trasplante fallido
+            c) Receptor en proceso
+            d) Receptor en espera
+            e) Donante registrado
+        - Si no se encuentra al paciente, se informará que no existe registro con ese DNI.
+
+    returns:
+        No retorna ningún valor. Imprime en consola el estado actual del trasplante según el paciente:
+        - Nombre del paciente
+        - DNI
+        - Órgano involucrado
+        - Centro de salud correspondiente
+        - Estado actual del procedimiento (exitoso, fallido, en espera, etc.)
     """
-    print("🔄 Procesando nuevos trasplantes...")
+    print(" Procesando nuevos trasplantes...")
 
     # Procesar todos los pacientes en los centros de salud
     pacientes_procesados = 0
@@ -458,13 +665,27 @@ def procesar_nuevos_trasplantes(incucai: INCUCAI):
                         pacientes_procesados += 1
 
     if pacientes_procesados > 0:
-        print(f"✅ Se procesaron {pacientes_procesados} nuevos trasplantes.")
+        print(f" Se procesaron {pacientes_procesados} nuevos trasplantes.")
     else:
-        print("ℹ️ No se encontraron nuevas compatibilidades para procesar.")
+        print(" No se encontraron nuevas compatibilidades para procesar.")
 
 def limpiar_terminal():
     """
-    Limpia la terminal dependiendo del sistema operativo
+    Limpia la terminal de comandos según el sistema operativo del usuario.
+
+    Esta función ejecuta un comando de sistema para limpiar la consola actual, 
+    asegurando compatibilidad tanto con sistemas operativos Windows como Unix 
+    (Linux y macOS).
+
+    No requiere argumentos y no retorna ningún valor. Su efecto es visual: 
+    limpia el contenido actual de la consola.
+
+    Uso:
+        limpiar_terminal()
+
+    Comportamiento por sistema operativo:
+        - Windows: ejecuta 'cls'
+        - Linux/macOS: ejecuta 'clear'
     """
     # Para Windows
     if os.name == 'nt':
@@ -498,6 +719,27 @@ def mostrar_menu():
 
 
 def menu(incu: INCUCAI):
+    """
+    Muestra el menú principal del sistema de gestión INCUCAI y gestiona la navegación del usuario.
+
+    Este menú permite al usuario:
+        1. Consultar los receptores por centro de salud.
+        2. Ver la lista de donantes registrados.
+        3. Consultar centros de salud disponibles.
+        4. Agregar un nuevo receptor y procesar su posible trasplante.
+        5. Agregar un nuevo donante y procesar su posible trasplante.
+        6. Consultar el resultado del trasplante de un paciente por DNI.
+        7. Salir del sistema.
+
+    param:
+        incu (INCUCAI): Instancia principal del sistema INCUCAI con los datos cargados.
+
+    precon:
+        El objeto 'incu' debe ser una instancia válida y correctamente inicializada de la clase INCUCAI.
+
+    returns:
+        None. La función se ejecuta en bucle hasta que el usuario elige salir.
+    """
     while True:
         limpiar_terminal()  # Limpiar al inicio
         mostrar_menu()  # Mostrar menú

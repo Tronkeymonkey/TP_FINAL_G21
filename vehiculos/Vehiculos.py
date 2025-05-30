@@ -3,11 +3,18 @@ from abc import ABC, abstractmethod #uso clase abstracta
 class Vehiculos(ABC):
     def __init__(self, velocidad_viajes, identificador):
         """
-        Constructor de la clase base abstracta Vehiculos.
+        Inicializa un vehículo con su velocidad de viaje y un identificador único.
 
-        Almacena la velocidad de viaje del vehículo y su identificador único (como la patente de una ambulancia,
-        nombre de helicóptero o código de avión). También inicializa una lista para registrar los viajes realizados 
-        y establece la disponibilidad inicial del vehículo como 'Disponible'.
+        params:
+            - velocidad_viajes: Velocidad a la que puede desplazarse el vehículo (por ejemplo, km/h).
+            - identificador: Identificador único del vehículo (patente, nombre de helicóptero o código de avión).
+
+        precon (opcional):
+            - velocidad_viajes debe ser un número positivo.
+            - identificador debe ser una cadena no vacía.
+
+        returns:
+            None. Inicializa una instancia de Vehiculos con los atributos proporcionados.
         """
         self.velocidad_viajes = velocidad_viajes
         self.identificador = identificador #El número de patente de una ambulancia. Un nombre de helicóptero ("HELI01", "HELI02") ,Código de un avión de transporte.
@@ -17,19 +24,35 @@ class Vehiculos(ABC):
     @abstractmethod    
     def despachar(self, distancia, nivel_trafico=3): #abstract method que se implementa o se sobreescribe por las subclases
         """
-        Método abstracto que debe ser implementado por todas las subclases.
-        Este método se encarga de calcular y registrar el tiempo de viaje de un vehículo a cierta distancia. 
-        Las subclases como Auto, Avion y Helicoptero deberán sobrescribir este método para definir su comportamiento específico.
+        Calcula y registra el tiempo de viaje para despachar el vehículo a una distancia dada.
+
+    params:
+        - distancia: La distancia que debe recorrer el vehículo (en kilómetros).
+        - nivel_trafico: Nivel de tráfico en la ruta, afecta el tiempo de viaje (por defecto 3).
+
+    precon (opcional):
+        - distancia debe ser un número positivo.
+        - nivel_trafico debe ser un entero entre 1 (bajo) y 5 (alto).
+
+    returns:
+        None. Debe registrar internamente el viaje realizado y actualizar el estado del vehículo.
         """
         pass 
     
     def _despacho_default(self, distancia, nivel_trafico): # creo un metodo protegido por default para avion y helicoptero (reutilizan el comportamiento sin sobreescribir)
         """
-        Método protegido que implementa un comportamiento común de despacho para Avion y Helicoptero.
-        Calcula el tiempo de viaje como distancia dividida por la velocidad del vehículo. 
-        Luego, guarda un registro con los datos del viaje (distancia, tráfico, tiempo estimado) 
-        y lo retorna.
-        Este método permite evitar duplicación de código en subclases que comparten la misma lógica.
+        Método protegido que calcula y registra el tiempo de viaje para despacho estándar.
+
+    params:
+        - distancia: Distancia a recorrer por el vehículo (en kilómetros).
+        - nivel_trafico: Nivel de tráfico en la ruta que podría afectar el viaje.
+
+    precon (opcional):
+        - distancia debe ser un valor positivo.
+        - nivel_trafico debe ser un entero válido representando el nivel de tráfico.
+
+    returns:
+        Tiempo estimado de viaje calculado como distancia dividida por la velocidad del vehículo.
         """
         tiempo = distancia / self.velocidad_viajes
         self.registro_viajes.append({
